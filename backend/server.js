@@ -1,0 +1,24 @@
+
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import connectdb from './config/mongodb.js'
+
+
+// App config
+
+const app = express()
+const PORT = process.env.PORT || 4000
+connectdb()
+// Middlewares
+
+app.use(express.json())
+app.use(cors())
+
+// api endpoints
+
+app.get('/',(req, res)=>{
+    res.send("API working")
+})
+
+app.listen(PORT, ()=> console.log("Server started on Port: " + PORT))
