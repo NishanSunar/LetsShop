@@ -1,6 +1,6 @@
 
 import { uploadOnCloudinary } from '../config/cloudinary.js';
-
+import productModel from '../models/productModel.js';
 
 //function for add product
 
@@ -18,15 +18,27 @@ const addProduct = async (req, res)=>{
         const imagesUrl = await Promise.all(
             images.map(async (item)=>{
                 const result = await uploadOnCloudinary(item.path)
-                console.log("result from cloudinary: ", result);
                 return result.secure_url
             })
         )
       
+        const productData = {
+            name,
+            description,
+            price: Number(price),
+            category,
+            subCategory,
+            bestSeller: bestSeller === 'true' ? true : false,
+            sizes: JSON.parse(sizes),
+            images: imagesUrl,
+            date: Date.now()
+        }
 
-        console.log(name, description, price, category, subCategory, sizes, bestSeller);
-        console.log(imagesUrl);
-        res.json({})
+        console.log(productData)
+        const product = new productModel(productData)
+        console.log(product)
+        await product.save()
+        res.json({success:true, message: "Product added successfully"})
         
     } catch(error){
         console.log(error)
@@ -38,7 +50,12 @@ const addProduct = async (req, res)=>{
 //function for list productconst addProduct = async (req, res)=>{
     
 const listProducts = async (req, res)=>{
-    
+    try {
+        const products = await productModel.find({});
+        res.json({success:true, products})
+    } catch (error) {
+        res.json({success:false, message:error.message})
+    }
 }
 
 //remove products
